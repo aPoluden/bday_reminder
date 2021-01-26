@@ -1,5 +1,6 @@
-import json, smtplib, configparser
+import json, smtplib, configparser, argparse, os
 import datetime as dt
+from argparse import ArgumentParser
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -48,4 +49,16 @@ def notify(employees, up_to_days):
         celebrants_date = dt.datetime.strptime(celebrants[0]['birthday'], '%Y-%m-%d').strftime("%d %b")
         _notify_congratulators(congratulators, celebrants_names, celebrants_date, up_to_days)
 
-notify(get_employees_list('employees.json'), 19)
+def validate_file(f):
+    if not os.path.exists(f):
+        # Argparse uses the ArgumentTypeError to give a rejection message like:
+        # error: argument input: x does not exist
+        raise argparse.ArgumentTypeError("{0} does not exist".format(f))
+    return f
+
+if __name__ == "__main__":
+    parser = ArgumentParser(description="Employee birthday notificator cli")
+    parser.add_argument("file", type=validate_file, help="json file")
+    parser.add_argument("-d", "--days", help="up to days", type=int, default=7)
+    parser.add_argument("-v", "--validate", help="validate the data file", action="store_true")
+    # TODO implement logic
