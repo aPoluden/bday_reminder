@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import json, smtplib, configparser, argparse, os, re, socket
 import datetime as dt
 from argparse import ArgumentParser
@@ -60,10 +61,8 @@ def _validate_file(f):
     valid_date = lambda bday: dt.datetime.strptime(bday, DATEFORMAT)
     employees = _get_employees_list(f)
     try:
-        for employee in _get_employees_list(f):
-            if employee['name'] and valid_mail(mail_regex, employee['email']) and valid_date(employee['birthday']):
-                continue
-            else:
+        for employee in employees:
+            if not (employee['name'] and valid_mail(mail_regex, employee['email']) and valid_date(employee['birthday'])):
                 raise argparse.ArgumentTypeError('Input file {} value do not meet constraints'.format(f))
     except (ValueError, KeyError):
          raise argparse.ArgumentTypeError('Input file {} value do not meet constraints'.format(f))
